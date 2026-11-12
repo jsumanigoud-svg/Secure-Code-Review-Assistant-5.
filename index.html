@@ -1,4 +1,3 @@
-
 <!DOCTYPE html>
 <html lang="en">
 <head>
@@ -30,8 +29,6 @@ header {
 header h2 {
     color: #38bdf8;
 }
-
-
 
 .container {
     display: flex !important;
@@ -75,7 +72,7 @@ header h2 {
 }
 
 /* Mobile layout */
-@media (max-width: 500px) {
+@media (max-width: 600px) {
     .container {
         flex-direction: column !important;
     }
@@ -90,32 +87,11 @@ header h2 {
     .sidebar button {
         width: auto;
     }
-}
 
-
-.main {
-    flex: 1;
-    min-width: 0;
-    padding: 30px;
-}
-
-@media(max-width: 600px) {
-    .container {
-        flex-direction: column;
-    }
-
-    .sidebar {
-        width: 100%;
-        flex-basis: auto;
-        flex-direction: row;
-        flex-wrap: wrap;
-    }
-
-    .sidebar button {
-        width: auto;
+    .main {
+        padding: 18px;
     }
 }
-
 
 .page {
     display: none;
@@ -150,6 +126,7 @@ h1 {
 .card p {
     font-size: 28px;
     color: #38bdf8;
+    font-weight: bold;
 }
 
 .panel {
@@ -167,6 +144,7 @@ input, select {
     border: 1px solid #475569;
     background: #334155;
     color: white;
+    font-size: 14px;
 }
 
 .action {
@@ -177,10 +155,45 @@ input, select {
     border-radius: 6px;
     cursor: pointer;
     margin-top: 12px;
+    font-size: 14px;
+    font-weight: bold;
 }
 
 .action:hover {
     background: #1d4ed8;
+}
+
+.action:disabled {
+    background: #475569;
+    cursor: not-allowed;
+}
+
+.action-danger {
+    background: #dc2626;
+    color: white;
+    border: none;
+    padding: 6px 12px;
+    border-radius: 4px;
+    cursor: pointer;
+    font-size: 12px;
+}
+
+.action-danger:hover {
+    background: #b91c1c;
+}
+
+.action-secondary {
+    background: #475569;
+    color: white;
+    border: none;
+    padding: 6px 12px;
+    border-radius: 4px;
+    cursor: pointer;
+    font-size: 12px;
+}
+
+.action-secondary:hover {
+    background: #334155;
 }
 
 table {
@@ -201,35 +214,47 @@ th {
 
 .critical {
     color: #f87171;
+    font-weight: bold;
 }
 
 .high {
     color: #fb923c;
+    font-weight: bold;
 }
 
 .medium {
     color: #facc15;
+    font-weight: bold;
 }
 
-#scanStatus {
+.low {
+    color: #4ade80;
+    font-weight: bold;
+}
+
+#scanStatus, #uploadStatus {
     color: #38bdf8;
     margin-top: 15px;
+    font-weight: 500;
 }
 
-@media(max-width:700px) {
-    .container {
-        flex-direction: column;
-    }
-    .sidebar {
-        width: 100%;
-    }
-    .sidebar button {
-        display: inline-block;
-        width: auto;
-    }
-    .main {
-        padding: 18px;
-    }
+.status-badge {
+    padding: 4px 8px;
+    border-radius: 4px;
+    font-size: 12px;
+    background: #334155;
+    color: #38bdf8;
+}
+
+.project-item {
+    background: #0f172a;
+    padding: 15px;
+    border-radius: 8px;
+    margin-bottom: 12px;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    border-left: 4px solid #38bdf8;
 }
 </style>
 </head>
@@ -238,20 +263,20 @@ th {
 
 <header>
     <h2>🛡 Secure Code Review Assistant</h2>
-    <span>Welcome, Sumani</span>
+    <span id="userGreeting">Welcome, Guest</span>
 </header>
 
 <div class="container">
 
     <aside class="sidebar">
-        <button class="active" onclick="showPage('dashboard',this)">Dashboard</button>
-        <button onclick="showPage('projects',this)">Projects</button>
-        <button onclick="showPage('upload',this)">Upload Code</button>
-        <button onclick="showPage('scan',this)">Security Scan</button>
-        <button onclick="showPage('results',this)">Scan Results</button>
-        <button onclick="showPage('history',this)">Scan History</button>
-        <button onclick="showPage('report',this)">Security Report</button>
-        <button onclick="showPage('login',this)">Logout</button>
+        <button id="navDashboard" class="active" onclick="showPage('dashboard',this)">Dashboard</button>
+        <button id="navProjects" onclick="showPage('projects',this)">Projects</button>
+        <button id="navUpload" onclick="showPage('upload',this)">Upload Code</button>
+        <button id="navScan" onclick="showPage('scan',this)">Security Scan</button>
+        <button id="navResults" onclick="showPage('results',this)">Scan Results</button>
+        <button id="navHistory" onclick="showPage('history',this)">Scan History</button>
+        <button id="navReport" onclick="showPage('report',this)">Security Report</button>
+        <button id="navAuth" onclick="handleAuthNav(this)">Login</button>
     </aside>
 
     <main class="main">
@@ -263,29 +288,30 @@ th {
             <div class="cards">
                 <div class="card">
                     <h3>Total Projects</h3>
-                    <p>05</p>
+                    <p id="dashTotalProjects">0</p>
                 </div>
 
                 <div class="card">
                     <h3>Total Scans</h3>
-                    <p>24</p>
+                    <p id="dashTotalScans">0</p>
                 </div>
 
                 <div class="card">
                     <h3>Critical Issues</h3>
-                    <p>03</p>
+                    <p id="dashCriticalIssues" class="critical">0</p>
                 </div>
 
                 <div class="card">
                     <h3>High Issues</h3>
-                    <p>08</p>
+                    <p id="dashHighIssues" class="high">0</p>
                 </div>
             </div>
 
             <div class="panel">
                 <h2>Recent Activity</h2>
-                <p style="margin-top:15px">JavaScript Project – Scan Completed</p>
-                <p style="margin-top:15px">Web Application – 3 Vulnerabilities Found</p>
+                <div id="dashRecentActivity" style="margin-top:15px">
+                    <p>No recent scan activity available.</p>
+                </div>
             </div>
         </section>
 
@@ -298,15 +324,21 @@ th {
                 <input id="projectName" placeholder="Enter Project Name">
 
                 <select id="language">
-                    <option>JavaScript</option>
-                    <option>Python</option>
-                    <option>Java</option>
-                    <option>C++</option>
+                    <option value="JavaScript">JavaScript</option>
+                    <option value="Python">Python</option>
+                    <option value="Java">Java</option>
+                    <option value="C++">C++</option>
                 </select>
 
-                <button class="action" onclick="addProject()">Create Project</button>
+                <input id="projectDescription" placeholder="Optional Description">
+
+                <button class="action" id="createProjectBtn" onclick="addProject()">Create Project</button>
+                <p id="projectMessage" style="margin-top:10px; font-size:14px;"></p>
+
                 <h3 style="margin-top:25px">My Projects</h3>
-                <ul id="projectList" style="padding:20px"></ul>
+                <div id="projectList" style="margin-top:15px">
+                    <p style="color:#94a3b8">Loading projects...</p>
+                </div>
             </div>
         </section>
 
@@ -315,11 +347,17 @@ th {
             <h1>Upload Source Code</h1>
 
             <div class="panel">
-                <h2>Select Source Code File</h2>
-                <input type="file" id="codeFile" accept=".js,.py,.java,.cpp,.c,.html,.css">
-                <p id="fileName">No file selected</p>
+                <h2>Select Target Project</h2>
+                <select id="uploadProjectSelect">
+                    <option value="">-- Select Project --</option>
+                </select>
 
-                <button class="action" onclick="uploadFile()">Upload File</button>
+                <h2 style="margin-top:20px">Select JavaScript Source Code File</h2>
+                <input type="file" id="codeFile" accept=".js,.mjs,.cjs">
+                <p id="fileName" style="margin: 10px 0; color:#94a3b8;">No file selected</p>
+
+                <button class="action" id="uploadBtn" onclick="uploadFile()">Upload File</button>
+                <p id="uploadStatus"></p>
             </div>
         </section>
 
@@ -329,9 +367,16 @@ th {
 
             <div class="panel">
                 <h2>Static Code Analysis</h2>
-                <p style="margin-top:15px">Analyze source code to identify security vulnerabilities.</p>
+                <p style="margin-top:15px">Analyze project source code using static analysis rules to identify security vulnerabilities.</p>
 
-                <button class="action" onclick="startScan()">Start Security Scan</button>
+                <div style="margin-top:20px">
+                    <label for="scanProjectSelect" style="color:#94a3b8; font-size:14px; display:block; margin-bottom:5px;">Select Project to Scan:</label>
+                    <select id="scanProjectSelect">
+                        <option value="">-- Select Project --</option>
+                    </select>
+                </div>
+
+                <button class="action" id="scanBtn" onclick="startScan()" style="margin-top:20px">Start Security Scan</button>
 
                 <p id="scanStatus">Waiting to start scan...</p>
             </div>
@@ -344,49 +389,41 @@ th {
             <div class="cards">
                 <div class="card">
                     <h3>Critical</h3>
-                    <p>03</p>
+                    <p id="resCritical" class="critical">0</p>
                 </div>
                 <div class="card">
                     <h3>High</h3>
-                    <p>08</p>
+                    <p id="resHigh" class="high">0</p>
                 </div>
                 <div class="card">
                     <h3>Medium</h3>
-                    <p>05</p>
+                    <p id="resMedium" class="medium">0</p>
                 </div>
                 <div class="card">
                     <h3>Low</h3>
-                    <p>02</p>
+                    <p id="resLow" class="low">0</p>
                 </div>
             </div>
 
             <div class="panel">
-                <h2>Detected Vulnerabilities</h2>
+                <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:15px;">
+                    <h2>Detected Vulnerabilities</h2>
+                    <span id="resultsProjectName" style="color:#38bdf8; font-size:14px;"></span>
+                </div>
 
                 <table>
-                    <tr>
-                        <th>Issue</th>
-                        <th>File</th>
-                        <th>Severity</th>
-                    </tr>
-
-                    <tr>
-                        <td>SQL Injection</td>
-                        <td>app.js</td>
-                        <td class="critical">Critical</td>
-                    </tr>
-
-                    <tr>
-                        <td>Hardcoded Password</td>
-                        <td>login.js</td>
-                        <td class="high">High</td>
-                    </tr>
-
-                    <tr>
-                        <td>Input Validation</td>
-                        <td>server.js</td>
-                        <td class="medium">Medium</td>
-                    </tr>
+                    <thead>
+                        <tr>
+                            <th>Issue</th>
+                            <th>File</th>
+                            <th>Line</th>
+                            <th>Severity</th>
+                            <th>Recommendation</th>
+                        </tr>
+                    </thead>
+                    <tbody id="vulnerabilitiesTableBody">
+                        <tr><td colspan="5" style="text-align:center; color:#94a3b8">No scan results loaded yet.</td></tr>
+                    </tbody>
                 </table>
             </div>
         </section>
@@ -397,21 +434,19 @@ th {
 
             <div class="panel">
                 <table>
-                    <tr>
-                        <th>Project</th>
-                        <th>Date</th>
-                        <th>Status</th>
-                    </tr>
-                    <tr>
-                        <td>Web Application</td>
-                        <td>10-11-2026</td>
-                        <td>Completed</td>
-                    </tr>
-                    <tr>
-                        <td>JavaScript Project</td>
-                        <td>09-11-2026</td>
-                        <td>Completed</td>
-                    </tr>
+                    <thead>
+                        <tr>
+                            <th>Project</th>
+                            <th>Target</th>
+                            <th>Date</th>
+                            <th>Findings</th>
+                            <th>Status</th>
+                            <th>Action</th>
+                        </tr>
+                    </thead>
+                    <tbody id="historyTableBody">
+                        <tr><td colspan="6" style="text-align:center; color:#94a3b8">No scan history available.</td></tr>
+                    </tbody>
                 </table>
             </div>
         </section>
@@ -420,88 +455,43 @@ th {
         <section id="report" class="page">
             <h1>Security Report</h1>
 
-            <div class="panel">
+            <div class="panel" id="reportPanel">
                 <h2>Vulnerability Assessment Report</h2>
-                <p style="margin-top:20px">Total Vulnerabilities: 18</p>
-                <p>Critical: 03</p>
-                <p>High: 08</p>
-                <p>Medium: 05</p>
-                <p>Low: 02</p>
+                <div id="reportDetails" style="margin-top:20px; line-height:1.8;">
+                    <p style="color:#94a3b8">No report generated yet. Run a scan or select a scan from History to view the report.</p>
+                </div>
 
-                <button class="action" onclick="window.print()">Print Report</button>
+                <button class="action" onclick="window.print()" style="margin-top:20px">Print Report</button>
             </div>
         </section>
 
-        <!-- Login -->
+        <!-- Login / Register -->
         <section id="login" class="page">
-            <h1>Login</h1>
-            <div class="panel">
-                <h2>Secure Code Review Assistant</h2>
-                <input placeholder="Email Address">
-                <input type="password" placeholder="Password">
-                <button class="action" onclick="alert('Demo login interface')">Login</button>
+            <h1 id="authTitle">Login</h1>
+            <div class="panel" style="max-width:440px; margin: 0 auto;">
+                <h2 id="authHeading">Secure Code Review Assistant</h2>
+                
+                <div id="authNameGroup" style="display:none;">
+                    <input id="authName" placeholder="Full Name">
+                </div>
+                <input id="authEmail" type="email" placeholder="Email Address">
+                <input id="authPassword" type="password" placeholder="Password">
+
+                <button class="action" id="authSubmitBtn" onclick="handleAuthSubmit()">Login</button>
+                <p id="authMessage" style="margin-top:12px; font-size:14px;"></p>
+
+                <p style="margin-top:18px; font-size:14px; color:#94a3b8;">
+                    <span id="authTogglePrompt">Don't have an account?</span>
+                    <a href="javascript:void(0)" id="authToggleLink" onclick="toggleAuthMode()" style="color:#38bdf8; text-decoration:none; margin-left:5px; font-weight:bold;">Register here</a>
+                </p>
             </div>
         </section>
 
     </main>
 </div>
 
-<script>
-function showPage(pageId, button) {
-    document.querySelectorAll('.page').forEach(page => {
-        page.classList.remove('active');
-    });
-
-    document.getElementById(pageId).classList.add('active');
-
-    document.querySelectorAll('.sidebar button').forEach(btn => {
-        btn.classList.remove('active');
-    });
-
-    button.classList.add('active');
-}
-
-function addProject() {
-    const name = document.getElementById('projectName').value;
-    const language = document.getElementById('language').value;
-
-    if (!name.trim()) {
-        alert('Please enter a project name');
-        return;
-    }
-
-    const li = document.createElement('li');
-    li.textContent = name + ' - ' + language;
-    document.getElementById('projectList').appendChild(li);
-
-    document.getElementById('projectName').value = '';
-}
-
-function uploadFile() {
-    const file = document.getElementById('codeFile').files[0];
-
-    if (!file) {
-        alert('Please select a file first');
-        return;
-    }
-
-    document.getElementById('fileName').textContent =
-        'Selected: ' + file.name;
-
-    alert('Demo: File selected successfully');
-}
-
-function startScan() {
-    document.getElementById('scanStatus').textContent =
-        'Scanning code...';
-
-    setTimeout(() => {
-        document.getElementById('scanStatus').textContent =
-            'Demo scan completed. View the Scan Results page.';
-        alert('Demo scan completed!');
-    }, 2000);
-}
-</script>
+<!-- Load application logic -->
+<script src="app.js"></script>
 
 </body>
 </html>
