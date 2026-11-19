@@ -20,11 +20,7 @@
     "dotenv": "^18.0.10",
     "express": "^5.3.0",
     "jsonwebtoken": "^9.0.3",
-<<<<<<< HEAD
     "mongoose": "^9.12.2",
-=======
-    "mongoose": "^9.12.1",
->>>>>>> 3f4638166009a36311986e37e3d12f11e88f2d72
     "multer": "^2.5.0"
   },
   "devDependencies": {
