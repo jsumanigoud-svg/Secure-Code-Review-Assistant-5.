@@ -1,12 +1,6 @@
-
-const dns = require("dns");
-
-dns.setServers(["8.8.8.8", "1.1.1.1"]);
-
-const connectDB = require("./config/db");const express = require("express");
+const express = require("express");
 const cors = require("cors");
 require("dotenv").config();
-
 
 const connectDB = require("./config");
 const authMiddleware = require("./middleware/auth");
