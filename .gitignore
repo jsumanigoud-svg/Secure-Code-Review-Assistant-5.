@@ -1,4 +1,5 @@
 node_modules/
+<<<<<<< HEAD
 **/node_modules/
 
 .env
@@ -11,3 +12,9 @@ uploads/
 
 *.log
 .DS_Store
+=======
+**/.env
+uploads/
+**/uploads/
+
+>>>>>>> 3f4638166009a36311986e37e3d12f11e88f2d72

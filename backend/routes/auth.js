@@ -6,6 +6,7 @@ const User = require("../models/User");
 
 const router = express.Router();
 
+<<<<<<< HEAD
 // ── Helpers ──────────────────────────────────────────────────────────────────
 
 /**
@@ -22,6 +23,9 @@ if (!process.env.JWT_SECRET) {
 }
 
 // ── POST /api/auth/register ──────────────────────────────────────────────────
+=======
+// Register user
+>>>>>>> 3f4638166009a36311986e37e3d12f11e88f2d72
 router.post("/register", async (req, res) => {
   try {
     const { name, email, password } = req.body;
@@ -30,11 +34,15 @@ router.post("/register", async (req, res) => {
       return res.status(400).json({ message: "All fields are required" });
     }
 
+<<<<<<< HEAD
     // Normalize email: lowercase + trim to prevent duplicate registrations
     // that differ only by case (e.g. User@Mail.com vs user@mail.com)
     const normalizedEmail = email.trim().toLowerCase();
 
     const existingUser = await User.findOne({ email: normalizedEmail });
+=======
+    const existingUser = await User.findOne({ email });
+>>>>>>> 3f4638166009a36311986e37e3d12f11e88f2d72
     if (existingUser) {
       return res.status(400).json({ message: "Email already registered" });
     }
@@ -42,27 +50,43 @@ router.post("/register", async (req, res) => {
     const hashedPassword = await bcrypt.hash(password, 10);
 
     const user = await User.create({
+<<<<<<< HEAD
       name: name.trim(),
       email: normalizedEmail,
       password: hashedPassword
     });
 
     console.log("[AUTH] New user registered:", normalizedEmail);
+=======
+      name,
+      email,
+      password: hashedPassword
+    });
+
+>>>>>>> 3f4638166009a36311986e37e3d12f11e88f2d72
     res.status(201).json({
       message: "User registered successfully",
       userId: user._id
     });
   } catch (error) {
+<<<<<<< HEAD
     console.error("[AUTH] Registration error:", error.message);
+=======
+>>>>>>> 3f4638166009a36311986e37e3d12f11e88f2d72
     res.status(500).json({ message: "Registration failed" });
   }
 });
 
+<<<<<<< HEAD
 // ── POST /api/auth/login ─────────────────────────────────────────────────────
+=======
+// Login user
+>>>>>>> 3f4638166009a36311986e37e3d12f11e88f2d72
 router.post("/login", async (req, res) => {
   try {
     const { email, password } = req.body;
 
+<<<<<<< HEAD
     if (!email || !password) {
       return res.status(400).json({ message: "Email and password are required" });
     }
@@ -110,6 +134,15 @@ router.post("/login", async (req, res) => {
 
     if (!isMatch) {
       console.log("[AUTH] Login failed — password mismatch for:", user.email);
+=======
+    const user = await User.findOne({ email });
+    if (!user) {
+      return res.status(400).json({ message: "Invalid email or password" });
+    }
+
+    const isMatch = await bcrypt.compare(password, user.password);
+    if (!isMatch) {
+>>>>>>> 3f4638166009a36311986e37e3d12f11e88f2d72
       return res.status(400).json({ message: "Invalid email or password" });
     }
 
@@ -119,11 +152,16 @@ router.post("/login", async (req, res) => {
       { expiresIn: "1d" }
     );
 
+<<<<<<< HEAD
     console.log("[AUTH] Login successful for:", user.email);
     res.json({ message: "Login successful", token });
 
   } catch (error) {
     console.error("[AUTH] Login error:", error.message);
+=======
+    res.json({ message: "Login successful", token });
+  } catch (error) {
+>>>>>>> 3f4638166009a36311986e37e3d12f11e88f2d72
     res.status(500).json({ message: "Login failed" });
   }
 });
